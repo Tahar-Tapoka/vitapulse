@@ -2,37 +2,42 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import CustomFormField from "../ui/CustomFormField";
-
-const formSchema = z.object({
-  username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-});
-
-export enum  FormFieldType {
-  INPUT = "input",
-  SELECT = "select",
-  CHECKBOX = "checkbox",
-  RADIO = "radio",
-  TEXTAREA = "textarea",
-  PHONE_INPUT = "phoneInput",
-  DATE_PICKER = "datePicker",
-  SKELETON= "skeleton",
-}
+import CustomFormField, { FormFieldType } from "../CustomFormField";
+import SubmitButton from "../SubmitButton";
+import { UserFormValidation } from "@/lib/validation";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { createUser } from "@/lib/actions/patient.actions";
 
 const PatientForm = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const form = useForm<z.infer<typeof UserFormValidation>>({
+    resolver: zodResolver(UserFormValidation),
     defaultValues: {
-      username: "",
+      name: "",
+      email: "",
+      phone: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  async function onSubmit({
+    name,
+    email,
+    phone,
+  }: z.infer<typeof UserFormValidation>) {
+    setIsLoading(true);
+    try {
+      const userData = { name, email, phone };
+      const user = await createUser(userData);
+      console.log(user);
+      if (user) router.push(`/patients/${user.$id}/register`);
+      setIsLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
+    // setIsLoading(false);
   }
 
   return (
@@ -46,7 +51,7 @@ const PatientForm = () => {
         <CustomFormField
           control={form.control}
           fieldType={FormFieldType.INPUT}
-          name="username"
+          name="name"
           label="Nom d'utilisateur Complet"
           placeholder="Votre nom d'utilisateur"
           iconSrc="/assets/icons/user.svg"
@@ -66,10 +71,9 @@ const PatientForm = () => {
           fieldType={FormFieldType.PHONE_INPUT}
           name="phone"
           label="Numéro de téléphone"
-          placeholder="(+213) 666666666"
+          placeholder="666666666"
         />
-
-        <Button type="submit">Submit</Button>
+        <SubmitButton isLoading={isLoading}>Commencez</SubmitButton>
       </form>
     </Form>
   );
