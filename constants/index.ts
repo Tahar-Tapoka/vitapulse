@@ -1,4 +1,4 @@
-export const GenderOptions = ["Male", "Female"];
+export const GenderOptions = ["male", "female"];
 
 export const PatientFormDefaultValues = {
   firstName: "",
@@ -6,7 +6,7 @@ export const PatientFormDefaultValues = {
   email: "",
   phone: "",
   birthDate: new Date(Date.now()),
-  gender: "Male" as Gender,
+  gender: "male" as Gender,
   address: "",
   occupation: "",
   emergencyContactName: "",
@@ -27,20 +27,19 @@ export const PatientFormDefaultValues = {
 };
 
 export const IdentificationTypes = [
-  "Birth Certificate",
-  "Driver's License",
-  "Medical Insurance Card/Policy",
-  "Military ID Card",
-  "National Identity Card",
-  "Passport",
-  "Resident Alien Card (Green Card)",
-  "Social Security Card",
-  "State ID Card",
-  "Student ID Card",
-  "Voter ID Card",
+  "Permis de conduire",
+  "Carte d'assurance",
+  "Carte d'identité militaire",
+  "Carte d'identité nationale",
+  "Passeport",
+  "Acte de naissance",
 ];
 
 export const Doctors = [
+  {
+    image: "/assets/images/dr-sabi.png",
+    name: "Sabi Tinhinane",
+  },
   {
     image: "/assets/images/dr-green.png",
     name: "John Green",
