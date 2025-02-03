@@ -1,29 +1,108 @@
 "use client";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Form, FormControl } from "@/components/ui/form";
-import CustomFormField, { FormFieldType } from "../CustomFormField";
-import SubmitButton from "../SubmitButton";
-import { PatientFormValidation } from "@/lib/validation";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { registerPatient } from "@/lib/actions/patient.actions";
-import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Doctors,
   GenderOptions,
   IdentificationTypes,
   PatientFormDefaultValues,
 } from "@/constants";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { registerPatient } from "@/lib/actions/patient.actions";
+import CustomFormField, { FormFieldType } from "../CustomFormField";
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Label } from "../ui/label";
 import { SelectItem } from "../ui/select";
 import Image from "next/image";
+import SubmitButton from "../SubmitButton";
 import FileUploader from "../FileUploader";
+
+const PatientFormValidation = z.object({
+  name: z
+    .string()
+    .min(2, "Name must be at least 2 characters")
+    .max(50, "Name must be at most 50 characters"),
+  email: z.string().email("Invalid email address"),
+  phone: z
+    .string()
+    .refine((phone) => /^\+\d{10,15}$/.test(phone), "Invalid phone number"),
+  birthDate: z.coerce
+    .date()
+    .refine((date) => date instanceof Date, "Invalid date format"),
+  gender: z.enum(["male", "female"]),
+  address: z
+    .string()
+    .min(5, "Address must be at least 5 characters")
+    .max(500, "Address must be at most 500 characters"),
+  occupation: z
+    .string()
+    .min(2, "Occupation must be at least 2 characters")
+    .max(500, "Occupation must be at most 500 characters"),
+  emergencyContactName: z
+    .string()
+    .min(2, "Contact name must be at least 2 characters")
+    .max(50, "Contact name must be at most 50 characters"),
+  emergencyContactNumber: z
+    .string()
+    .refine(
+      (emergencyContactNumber) => /^\+\d{10,15}$/.test(emergencyContactNumber),
+      "Invalid phone number"
+    ),
+  // primaryPhysician: z.string().optional(),
+  primaryPhysician: z.string().min(2, "Select at least one doctor"),
+  insuranceProvider: z
+    .string()
+    .min(2, "Insurance name must be at least 2 characters")
+    .max(50, "Insurance name must be at most 50 characters"),
+  insurancePolicyNumber: z
+    .string()
+    .min(2, "Policy number must be at least 2 characters")
+    .max(50, "Policy number must be at most 50 characters"),
+  allergies: z.string().optional(),
+  currentMedications: z.string().optional(),
+  familyMedicalHistory: z.string().optional(),
+  pastMedicalHistory: z.string().optional(),
+  identificationType: z.string().optional(),
+  identificationNumber: z.string().optional(),
+  identificationDocument: z.custom<File[]>().optional(),
+  treatmentConsent: z
+    .boolean()
+    .default(false)
+    .refine((value) => value === true, {
+      message: "You must consent to treatment in order to proceed",
+    }),
+  disclosureConsent: z
+    .boolean()
+    .default(false)
+    .refine((value) => value === true, {
+      message: "You must consent to disclosure in order to proceed",
+    }),
+  privacyConsent: z
+    .boolean()
+    .default(false)
+    .refine((value) => value === true, {
+      message: "You must consent to privacy in order to proceed",
+    }),
+  // treatmentConsent: z.boolean().default(false),
+  // disclosureConsent: z.boolean().default(false),
+  // privacyConsent: z.boolean().default(false),
+});
 
 const RegisterForm = ({ user }: { user: User }) => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
   const form = useForm<z.infer<typeof PatientFormValidation>>({
     resolver: zodResolver(PatientFormValidation),
     defaultValues: {
@@ -34,65 +113,8 @@ const RegisterForm = ({ user }: { user: User }) => {
     },
   });
 
-  // async function onSubmit(
-  //   values: //{ name,
-  //   // email,
-  //   // phone,
-  //   // birthDate,
-  //   // gender,
-  //   // address,
-  //   // occupation,
-  //   // emergencyContactName,
-  //   // emergencyContactNumber,
-  //   // primaryPhysician,
-  //   // insuranceProvider,
-  //   // insurancePolicyNumber,
-  //   // allergies,
-  //   // currentMedication,
-  //   // familyMedicalHistory,
-  //   // pastMedicalHistory,
-  //   // identificationType,
-  //   // identificationNumber,
-  //   // identificationDocument,
-  //   // treatmentConsent,
-  //   // disclosureConsent,
-  //   // privacyConsent,}
-  //   z.infer<typeof PatientFormValidation>
-  // ) {
-  //   setIsLoading(true);
-  //   let formData;
-  //   if (
-  //     values.identificationDocument &&
-  //     values.identificationDocument.length > 0
-  //   ) {
-  //     const blobFile = new Blob([values.identificationDocument[0]], {
-  //       type: values.identificationDocument[0].type,
-  //     });
-  //     formData = new FormData();
-  //     formData.append("blobFile", blobFile);
-  //     formData.append("fileName", values.identificationDocument[0].name);
-  //   }
-
-  //   try {
-  //     const patientData = {
-  //       ...values,
-  //       userId: user.$id,
-  //       birthDate: new Date(values.birthDate),
-  //       idetificationDocument: formData,
-  //     };
-  //     //@ts-ignore
-  //     const patient = await registerPatient(patientData);
-  //     console.log(patient);
-  //     if (patient) router.push(`/patients/${user.$id}/new-appointment`);
-  //     setIsLoading(false);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
   const onSubmit = async (values: z.infer<typeof PatientFormValidation>) => {
-    console.log(values);
     setIsLoading(true);
-
     // Store file info in form data as
     let formData;
     if (
@@ -110,8 +132,8 @@ const RegisterForm = ({ user }: { user: User }) => {
 
     try {
       const patient = {
-        userId: user.$id,
         name: values.name,
+        userId: user.$id,
         email: values.email,
         phone: values.phone,
         birthDate: new Date(values.birthDate),
@@ -124,7 +146,7 @@ const RegisterForm = ({ user }: { user: User }) => {
         insuranceProvider: values.insuranceProvider,
         insurancePolicyNumber: values.insurancePolicyNumber,
         allergies: values.allergies,
-        currentMedication: values.currentMedication,
+        currentMedications: values.currentMedications,
         familyMedicalHistory: values.familyMedicalHistory,
         pastMedicalHistory: values.pastMedicalHistory,
         identificationType: values.identificationType,
@@ -133,7 +155,10 @@ const RegisterForm = ({ user }: { user: User }) => {
           ? formData
           : undefined,
         privacyConsent: values.privacyConsent,
+        treatmentConsent: values.treatmentConsent,
+        disclosureConsent: values.disclosureConsent,
       };
+      console.log("patient!", patient);
 
       const newPatient = await registerPatient(patient);
 
@@ -157,6 +182,7 @@ const RegisterForm = ({ user }: { user: User }) => {
           <h1 className="header">Bienvenue ! 😊</h1>
           <p className="text-dark-700">Faites-nous en savoir plus sur vous !</p>
         </section>
+
         <section className="space-y-6 ">
           <div className="space-y-1 mb-9 ">
             <h2 className="sub-header">Informations personnelles </h2>
@@ -164,10 +190,9 @@ const RegisterForm = ({ user }: { user: User }) => {
           <CustomFormField
             fieldType={FormFieldType.INPUT}
             control={form.control}
-            // disabled
             name="name"
             label="Nom Complet"
-            placeholder={user.name}
+            // placeholder={user.name}
             iconSrc="/assets/icons/user.svg"
             iconAlt="user"
           />
@@ -175,23 +200,13 @@ const RegisterForm = ({ user }: { user: User }) => {
             <CustomFormField
               fieldType={FormFieldType.INPUT}
               control={form.control}
-              // disabled
               name="email"
               label="Adresse email"
               placeholder={user.email}
               iconSrc="/assets/icons/email.svg"
               iconAlt="email"
             />
-            {/* <CustomFormField
-              fieldType={FormFieldType.INPUT}
-              control={form.control}
-              disabled
-              name="phone"
-              label="Numéro de téléphone"
-              placeholder={user.phone}
-              iconSrc="/assets/icons/phone.png"
-              iconAlt="phone"
-            /> */}
+
             <CustomFormField
               fieldType={FormFieldType.PHONE_INPUT}
               control={form.control}
@@ -270,6 +285,7 @@ const RegisterForm = ({ user }: { user: User }) => {
             />
           </div>
         </section>
+
         <section className="space-y-4">
           <div className="space-y-1 mb-9 ">
             <h2 className="sub-header">Informations médicales</h2>
@@ -278,12 +294,12 @@ const RegisterForm = ({ user }: { user: User }) => {
           <CustomFormField
             fieldType={FormFieldType.SELECT}
             control={form.control}
-            name="primaryPhisician"
+            name="primaryPhysician"
             label="Médecin traitant"
             placeholder="Sélectionner un médecin"
           >
             {Doctors.map((dr) => (
-              <SelectItem key={dr.name} value={dr.name}>
+              <SelectItem key={dr.image} value={dr.name}>
                 <div className="flex cursor-pointer items-center gap-2">
                   <Image
                     src={dr.image}
@@ -398,7 +414,7 @@ const RegisterForm = ({ user }: { user: User }) => {
         <CustomFormField
           fieldType={FormFieldType.CHECKBOX}
           control={form.control}
-          name="diclosureConsent"
+          name="disclosureConsent"
           label="Je consens à l'utilisation et à la divulgation de mes informations médicales à des fins de traitement"
         />
         <CustomFormField
@@ -407,6 +423,7 @@ const RegisterForm = ({ user }: { user: User }) => {
           name="privacyConsent"
           label="Je reconnais avoir pris connaissance et accepté la politique de confidentialité."
         />
+
         <SubmitButton isLoading={isLoading}>
           Soumettre et continuer
         </SubmitButton>
