@@ -10,6 +10,22 @@ export const UserFormValidation = z.object({
     .string()
     .refine((phone) => /^\+\d{10,15}$/.test(phone), "Invalid phone number"),
 });
+// export const AppointmentFormValidation = z.object({
+//   primaryPhysician: z.string().min(2, "Select at least one doctor"),
+//   reason: z.string().optional(),
+//   note: z.string().optional(),
+//   schedule: z.coerce.date(),
+//   cancellationReason: z.string().optional(),
+
+//   name: z
+//     .string()
+//     .min(2, "Name must be at least 2 characters")
+//     .max(50, "Name must be at most 50 characters"),
+//   email: z.string().email("Invalid email address"),
+//   phone: z
+//     .string()
+//     .refine((phone) => /^\+\d{10,15}$/.test(phone), "Invalid phone number"),
+// });
 
 export const PatientFormValidation = z.object({
   name: z
@@ -20,7 +36,9 @@ export const PatientFormValidation = z.object({
   phone: z
     .string()
     .refine((phone) => /^\+\d{10,15}$/.test(phone), "Invalid phone number"),
-  birthDate: z.coerce.date(),
+  birthDate: z.coerce
+    .date()
+    .refine((date) => date instanceof Date, "Invalid date format"),
   gender: z.enum(["male", "female"]),
   address: z
     .string()

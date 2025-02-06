@@ -37,7 +37,7 @@ const PatientForm = () => {
     } catch (error) {
       console.log(error);
     }
-    // setIsLoading(false);
+    setIsLoading(false);
   }
 
   return (
@@ -71,7 +71,6 @@ const PatientForm = () => {
           fieldType={FormFieldType.PHONE_INPUT}
           name="phone"
           label="Numéro de téléphone"
-          placeholder="666666666"
         />
         <SubmitButton isLoading={isLoading}>Commencez</SubmitButton>
       </form>

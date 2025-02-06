@@ -2,15 +2,7 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Form, FormControl } from "@/components/ui/form";
 import {
   Doctors,
   GenderOptions,
@@ -59,7 +51,6 @@ const PatientFormValidation = z.object({
       (emergencyContactNumber) => /^\+\d{10,15}$/.test(emergencyContactNumber),
       "Invalid phone number"
     ),
-  // primaryPhysician: z.string().optional(),
   primaryPhysician: z.string().min(2, "Select at least one doctor"),
   insuranceProvider: z
     .string()
@@ -94,9 +85,6 @@ const PatientFormValidation = z.object({
     .refine((value) => value === true, {
       message: "You must consent to privacy in order to proceed",
     }),
-  // treatmentConsent: z.boolean().default(false),
-  // disclosureConsent: z.boolean().default(false),
-  // privacyConsent: z.boolean().default(false),
 });
 
 const RegisterForm = ({ user }: { user: User }) => {
@@ -158,7 +146,6 @@ const RegisterForm = ({ user }: { user: User }) => {
         treatmentConsent: values.treatmentConsent,
         disclosureConsent: values.disclosureConsent,
       };
-      console.log("patient!", patient);
 
       const newPatient = await registerPatient(patient);
 
@@ -168,7 +155,6 @@ const RegisterForm = ({ user }: { user: User }) => {
     } catch (error) {
       console.log(error);
     }
-
     setIsLoading(false);
   };
 
@@ -222,9 +208,8 @@ const RegisterForm = ({ user }: { user: User }) => {
               control={form.control}
               name="birthDate"
               label="Date de naissance"
-              placeholder={user.email}
-              iconSrc="/assets/icons/email.svg"
-              iconAlt="email"
+              iconSrc="/assets/icons/calendar.svg"
+              iconAlt="Date de naissance"
             />
             <CustomFormField
               fieldType={FormFieldType.SKELETON}

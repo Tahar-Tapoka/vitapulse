@@ -15,27 +15,6 @@ export const metadata: Metadata = {
   description: "Système de gestion des soins de santé",
 };
 
-// export default function RootLayout({
-//   children,
-// }: Readonly<{
-//   children: React.ReactNode;
-// }>) {
-//   return (
-//     <html lang="en">
-//       <body
-//         className={cn(
-//           "min-h-screen bg-dark-300 font-sans antialiased",
-//           fontSans.variable
-//         )}
-//       >
-//         <ThemeProvider attribute="class" defaultTheme="dark">
-//           {children}
-//         </ThemeProvider>
-//       </body>
-//     </html>
-//   );
-// }
-
 export default function RootLayout({
   children,
 }: Readonly<{
