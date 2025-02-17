@@ -19,6 +19,7 @@ import { SelectItem } from "../ui/select";
 import Image from "next/image";
 import SubmitButton from "../SubmitButton";
 import FileUploader from "../FileUploader";
+import { encryptKey } from "@/lib/utils";
 
 const PatientFormValidation = z.object({
   name: z
@@ -95,9 +96,9 @@ const RegisterForm = ({ user }: { user: User }) => {
     resolver: zodResolver(PatientFormValidation),
     defaultValues: {
       ...PatientFormDefaultValues,
-      name: "",
-      email: "",
-      phone: "",
+      name: user?.name || "",
+      email: user?.email || "",
+      phone: user?.phone || "",
     },
   });
 
@@ -150,6 +151,8 @@ const RegisterForm = ({ user }: { user: User }) => {
       const newPatient = await registerPatient(patient);
 
       if (newPatient) {
+        const encryptedKey = encryptKey(patient.phone);
+        localStorage.setItem("patient", encryptedKey);
         router.push(`/patients/${user.$id}/new-appointment`);
       }
     } catch (error) {

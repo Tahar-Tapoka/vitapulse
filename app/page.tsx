@@ -1,11 +1,14 @@
 import PatientForm from "@/components/forms/PatientForm";
+import PasskeyModal from "@/components/PasskeyModal";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function Home() {
+export default async function Home({ searchParams }: SearchParamProps) {
+  const resolvedSearch = await searchParams;
+  const isAdmin = resolvedSearch.admin === "true";
   return (
     <div className="flex h-screen max-h-screen">
-      {/* OTP verification  */}
+      {isAdmin && <PasskeyModal />}
       <section className="remove-scrollbae container my-auto">
         <div className="sub-container max-w-[496px]">
           <Image
@@ -16,7 +19,7 @@ export default function Home() {
             className="mb-12 h-10 w-fit"
           />
           <PatientForm />
-          <div className="text-14-regular mt-20 flex justify-between">
+          <div className="text-14-regular mt-10 flex justify-between">
             <p className="justify-items-end text-dark-600 xl:text-left">
               © 2024 VitaPulse
             </p>
@@ -31,7 +34,7 @@ export default function Home() {
         alt="VitaPulse a HealthCare system"
         height={1000}
         width={1000}
-        className="side-img max-w-50%"
+        className="side-img max-w-[50%] height-[100%]"
       />
     </div>
   );

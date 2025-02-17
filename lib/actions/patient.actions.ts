@@ -14,8 +14,6 @@ import { parseStringify } from "../utils";
 
 export const createUser = async (user: CreateUserParams) => {
   try {
-    console.log("id", PROJECT_ID);
-
     const newUser = await users.create(
       ID.unique(),
       user.email,
@@ -24,7 +22,6 @@ export const createUser = async (user: CreateUserParams) => {
       user.name
     );
     return newUser;
-    console.log(newUser);
   } catch (error: any) {
     if (error && error?.code === 409) {
       const document = await users.list([Query.equal("email", [user.email])]);
@@ -86,6 +83,18 @@ export const getPatient = async (userId: string) => {
       DATABASE_ID!,
       PATIENT_COLLECTION_ID!,
       [Query.equal("userId", userId)]
+    );
+    return parseStringify(patients.documents[0]);
+  } catch (error) {
+    console.log(error);
+  }
+};
+export const getExPatient = async (phone: string) => {
+  try {
+    const patients = await databases.listDocuments(
+      DATABASE_ID!,
+      PATIENT_COLLECTION_ID!,
+      [Query.equal("phone", phone)]
     );
     return parseStringify(patients.documents[0]);
   } catch (error) {

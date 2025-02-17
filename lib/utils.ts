@@ -12,24 +12,23 @@ export const convertFileToUrl = (file: File) => URL.createObjectURL(file);
 // FORMAT DATE TIME
 export const formatDateTime = (dateString: Date | string) => {
   const dateTimeOptions: Intl.DateTimeFormatOptions = {
-    // weekday: "short", // abbreviated weekday name (e.g., 'Mon')
-    month: "short", // abbreviated month name (e.g., 'Oct')
+    month: "short", // abbreviated month name (e.g., 'oct.')
     day: "numeric", // numeric day of the month (e.g., '25')
     year: "numeric", // numeric year (e.g., '2023')
     hour: "numeric", // numeric hour (e.g., '8')
     minute: "numeric", // numeric minute (e.g., '30')
-    hour12: true, // use 12-hour clock (true) or 24-hour clock (false)
+    hour12: false, // use 24-hour clock (false) for French format
   };
 
   const dateDayOptions: Intl.DateTimeFormatOptions = {
-    weekday: "short", // abbreviated weekday name (e.g., 'Mon')
+    weekday: "short", // abbreviated weekday name (e.g., 'lun.')
     year: "numeric", // numeric year (e.g., '2023')
-    month: "2-digit", // abbreviated month name (e.g., 'Oct')
-    day: "2-digit", // numeric day of the month (e.g., '25')
+    month: "2-digit", // 2-digit month (e.g., '10')
+    day: "2-digit", // 2-digit day (e.g., '25')
   };
 
   const dateOptions: Intl.DateTimeFormatOptions = {
-    month: "short", // abbreviated month name (e.g., 'Oct')
+    month: "short", // abbreviated month name (e.g., 'oct.')
     year: "numeric", // numeric year (e.g., '2023')
     day: "numeric", // numeric day of the month (e.g., '25')
   };
@@ -37,28 +36,21 @@ export const formatDateTime = (dateString: Date | string) => {
   const timeOptions: Intl.DateTimeFormatOptions = {
     hour: "numeric", // numeric hour (e.g., '8')
     minute: "numeric", // numeric minute (e.g., '30')
-    hour12: true, // use 12-hour clock (true) or 24-hour clock (false)
+    hour12: false, // use 24-hour clock (false) for French format
   };
 
-  const formattedDateTime: string = new Date(dateString).toLocaleString(
-    "en-US",
+  // Convert the input to a Date object if it's a string
+  const date =
+    typeof dateString === "string" ? new Date(dateString) : dateString;
+
+  // Format the date and time in French
+  const formattedDateTime: string = date.toLocaleString(
+    "fr-FR",
     dateTimeOptions
   );
-
-  const formattedDateDay: string = new Date(dateString).toLocaleString(
-    "en-US",
-    dateDayOptions
-  );
-
-  const formattedDate: string = new Date(dateString).toLocaleString(
-    "en-US",
-    dateOptions
-  );
-
-  const formattedTime: string = new Date(dateString).toLocaleString(
-    "en-US",
-    timeOptions
-  );
+  const formattedDateDay: string = date.toLocaleString("fr-FR", dateDayOptions);
+  const formattedDate: string = date.toLocaleString("fr-FR", dateOptions);
+  const formattedTime: string = date.toLocaleString("fr-FR", timeOptions);
 
   return {
     dateTime: formattedDateTime,

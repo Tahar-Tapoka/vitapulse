@@ -8,7 +8,8 @@ import SubmitButton from "../SubmitButton";
 import { UserFormValidation } from "@/lib/validation";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createUser } from "@/lib/actions/patient.actions";
+import { createUser, getExPatient } from "@/lib/actions/patient.actions";
+import { encryptKey } from "@/lib/utils";
 
 const PatientForm = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -30,8 +31,15 @@ const PatientForm = () => {
     setIsLoading(true);
     try {
       const userData = { name, email, phone };
+      const exUser = await getExPatient(phone);
+      if (exUser) {
+        const encryptedKey = encryptKey(phone);
+        localStorage.setItem("patient", encryptedKey);
+        router.push(`/patients/${exUser.userId}/new-appointment`);
+        setIsLoading(false);
+        return;
+      }
       const user = await createUser(userData);
-      console.log(user);
       if (user) router.push(`/patients/${user.$id}/register`);
       setIsLoading(false);
     } catch (error) {
